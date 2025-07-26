@@ -1,5 +1,10 @@
-type: web
-name: telegram-bot
-env: docker
-region: oregon
-plan: free
+services:
+  - type: worker
+    name: telegram-bot
+    env: python
+    region: oregon
+    plan: free
+    runtime: python
+    version: 3.11
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
