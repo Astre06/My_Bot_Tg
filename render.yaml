@@ -2,5 +2,9 @@ services:
   - type: web
     name: telegram-bot
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python bot.py"
+    region: oregon
+    plan: free
+    runtime: python
+    version: 3.11
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
