@@ -1,19 +1,17 @@
+import os
 import asyncio
 import nest_asyncio
 import random
 import string
 import aiohttp
 import re
-import time
 from telegram import Update, BotCommand
-from telegram.ext import (
-    ApplicationBuilder, CommandHandler, ContextTypes
-)
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 nest_asyncio.apply()
 
 MAIL_TM_API = "https://api.mail.tm"
-BOT_TOKEN = "your_bot_token_here"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 polling_tasks = {}
 
@@ -101,8 +99,10 @@ async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("Nothing is running.")
 
-# === Main runner ===
 async def main():
+    if not BOT_TOKEN:
+        raise ValueError("⚠️ BOT_TOKEN is not set. Add it as an environment variable.")
+
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("email", email_command))
     app.add_handler(CommandHandler("cancel", cancel_command))
