@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: My_Bot_Tg
+    name: telegram-bot
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python bot.py"
