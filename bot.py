@@ -211,6 +211,8 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
             await query.edit_message_text(f"You selected: {query.data.replace('_', ' ').title()}")
 
     except Exception as e:
+                    # Handle the exception
+        print(f"An error occurred: {e}")
         await context.bot.send_message(chat_id=chat_id, text=f"❌ Error: {e}")
 async def login_flow_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
