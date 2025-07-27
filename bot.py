@@ -19,7 +19,6 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 polling_tasks = {}
 seen_ids_map = {}
-dot_state = {}
 
 def generate_username():
     suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
@@ -170,37 +169,35 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
             await context.bot.send_message(chat_id=chat_id, text="📱 Listening for incoming emails...")
             task = asyncio.create_task(poll_inbox(context, token, chat_id))
             polling_tasks[chat_id] = task
-        except Exception as e:
-            await context.bot.send_message(chat_id=chat_id, text=f"❌ Error: {e}")
 
-    # 🟣 Dot Gen block must start AFTER the try/except finishes
+except Exception as e:
+    await context.bot.send_message(chat_id=chat_id, text=f"❌ Error: {e}")
+
+
+elif query.data == "login_tm":
+        await context.bot.send_message(chat_id=chat_id, text="🔐 Please send your Mail.tm email address:")
+        context.user_data['login_step'] = 'awaiting_email'
+
     elif query.data == "dot_gen":
         await query.edit_message_text("✉️ Please send your real Gmail address:")
         context.user_data['dot_step'] = 'awaiting_gmail'
-
 
     elif query.data == "next_dot":
         state = dot_state.get(chat_id)
         if not state:
             await context.bot.send_message(chat_id=chat_id, text="❌ No Gmail in memory. Start with Dot Gen again.")
             return
-
         state['index'] += 1
         variants = state['variants']
         idx = state['index']
-
         if idx >= len(variants):
             await context.bot.send_message(chat_id=chat_id, text="✅ No more dot variants.")
             return
-
         next_email = f"{variants[idx]}@gmail.com"
-        keyboard = [
-                 [
-                        InlineKeyboardButton("🔁 New", callback_data="next_dot"),
-                        InlineKeyboardButton("🔙 Back", callback_data="back_dot")
-                ]
-        ]
-
+        keyboard = [[
+            InlineKeyboardButton("🔁 New", callback_data="next_dot"),
+            InlineKeyboardButton("🔙 Back", callback_data="back_dot")
+        ]]
         await context.bot.send_message(
             chat_id=chat_id,
             text=f"✅ Dot Email:\n`{next_email}`",
@@ -208,22 +205,10 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
             parse_mode='Markdown'
         )
 
-        # THEN start your next handler:
-        elif query.data == "back_dot":
-            await context.bot.send_message(chat_id=chat_id, text="✉️ Send your new real Gmail address:")
-            context.user_data['dot_step'] = 'awaiting_gmail'
-            dot_state.pop(chat_id, None)  # reset state
-            email, token = await create_account()
-            await context.bot.send_message(chat_id=chat_id, text=f"📬 Temp Email: `{email}`", parse_mode='Markdown')
-            await context.bot.send_message(chat_id=chat_id, text="📱 Listening for incoming emails...")
-            task = asyncio.create_task(poll_inbox(context, token, chat_id))
-            polling_tasks[chat_id] = task
-        except Exception as e:
-            await context.bot.send_message(chat_id=chat_id, text=f"❌ Error: {e}")
-
-    elif query.data == "login_tm":
-        await context.bot.send_message(chat_id=chat_id, text="🔐 Please send your Mail.tm email address:")
-        context.user_data['login_step'] = 'awaiting_email'
+    elif query.data == "back_dot":
+        await context.bot.send_message(chat_id=chat_id, text="✉️ Send your new real Gmail address:")
+        context.user_data['dot_step'] = 'awaiting_gmail'
+        dot_state.pop(chat_id, None)
 
     elif query.data == "main_menu":
         keyboard = [
@@ -247,6 +232,28 @@ async def login_flow_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     step = context.user_data.get('login_step')
 
     if step == 'awaiting_email':
+
+    if context.user_data.get('dot_step') == 'awaiting_gmail':
+        gmail = text.strip().lower()
+        if not gmail.endswith("@gmail.com") or '@' not in gmail:
+            await update.message.reply_text("⚠️ Please send a valid Gmail address.")
+            return
+        username = gmail.split("@")[0]
+        variants = generate_dot_variants(username)
+        dot_state[chat_id] = {"variants": variants, "index": 0, "base": username}
+        first = f"{variants[0]}@gmail.com"
+        keyboard = [[
+            InlineKeyboardButton("🔁 New", callback_data="next_dot"),
+            InlineKeyboardButton("🔙 Back", callback_data="back_dot")
+        ]]
+        await update.message.reply_text(
+            f"✅ Dot Email:\n`{first}`",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode='Markdown'
+        )
+        context.user_data['dot_step'] = None
+        return
+
         context.user_data['login_email'] = text
         context.user_data['login_step'] = 'awaiting_password'
         await update.message.reply_text("🔑 Now send your Mail.tm password:")
