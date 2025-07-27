@@ -165,7 +165,7 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
         await query.edit_message_text("📝 Creating Mail.tm account...")
         try:
             email, token = await create_account()
-            await context.bot.send_message(chat_id=chat_id, text=f"📬 Tempmail: `{email}`", parse_mode='Markdown')
+            await context.bot.send_message(chat_id=chat_id, text=f"📬 Temp Email: `{email}`", parse_mode='Markdown')
             await context.bot.send_message(chat_id=chat_id, text="📱 Listening for incoming emails...")
             task = asyncio.create_task(poll_inbox(context, token, chat_id))
             polling_tasks[chat_id] = task
@@ -248,10 +248,10 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), login_flow_handler))
 
     await app.bot.set_my_commands([
-        BotCommand("logout"),
-        BotCommand("tempmail"),
-        BotCommand("account"),
-        BotCommand("cancel")
+        BotCommand("logout", "Stop inbox and clear login data"),
+        BotCommand("tempmail", "Generate temp email and receive codes"),
+        BotCommand("account", "Choose account type for signup"),
+        BotCommand("cancel", "Cancel inbox listener and reset")
     ])
 
     print("✅ Bot is running...")
@@ -267,4 +267,4 @@ if __name__ == "__main__":
             asyncio.set_event_loop(loop)
             loop.run_until_complete(main())
         else:
-            raise
+            raise  look my code i was upload in render and this is the logs 
