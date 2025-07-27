@@ -33,7 +33,7 @@ async def get_all_domains():
 async def create_account():
     domains = await get_all_domains()
     username = generate_username()
-    password = "AstreSecret123"
+    password = "Neljane143"
     debug_log = []
 
     for domain in domains:
@@ -83,7 +83,20 @@ async def poll_inbox(context: ContextTypes.DEFAULT_TYPE, token, chat_id):
                             # Clean inner xhtml html segment (if present)
                             body_html = re.sub(r'<html[^>]*xmlns="http://www\\.w3\\.org/1999/xhtml"[^>]*>.*?</html>', '', body_html, flags=re.DOTALL | re.IGNORECASE)
 
-                            # Must include this full <td> pattern to identify correct code
+                            
+user_gmail_memory = {}
+
+def generate_dot_variant(email: str) -> str:
+    local, domain = email.split("@")
+    positions = list(range(1, len(local)))
+    random.shuffle(positions)
+    for pos in positions:
+        if local[pos - 1] != "." and local[pos] != ".":
+            dotted = local[:pos] + "." + local[pos:]
+            return f"{dotted}@{domain}"
+    return email
+
+# Must include this full <td> pattern to identify correct code
                             td_pattern = r'<td align="left" class="copy lrg-number regular content-padding" style="padding-left: 40px; padding-right: 40px; font-size: 28px; line-height: 32px; letter-spacing: 6px; font-family: \'Netflix Sans\', \'Helvetica Neue\', Roboto, Segoe UI, sans-serif; font-weight: 400; color: #232323; padding-top: 20px;">\\s*(\\d{4,8})\\s*</td>'
                             full_td_match = re.search(td_pattern, body_html, re.IGNORECASE)
                             if full_td_match:
@@ -124,7 +137,7 @@ async def account_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ],
         [
             InlineKeyboardButton("🎥 YouTube", callback_data="account_youtube"),
-            InlineKeyboardButton("🧚 Sample 1", callback_data="account_sample1")
+            InlineKeyboardButton("🟣 Dot Gen", callback_data="account_sample1")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -134,7 +147,7 @@ async def tempmail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [
             InlineKeyboardButton("📧 Mail.tm", callback_data="mail_tm"),
-            InlineKeyboardButton("🧚 Sample 1", callback_data="sample_1")
+            InlineKeyboardButton("🟣 Dot Gen", callback_data="dotgen_start")
         ],
         [
             InlineKeyboardButton("🧚 Sample 2", callback_data="sample_2"),
@@ -180,7 +193,7 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
         keyboard = [
             [
                 InlineKeyboardButton("📧 Mail.tm", callback_data="mail_tm"),
-                InlineKeyboardButton("🧚 Sample 1", callback_data="sample_1")
+                InlineKeyboardButton("🟣 Dot Gen", callback_data="dotgen_start")
             ],
             [
                 InlineKeyboardButton("🧚 Sample 2", callback_data="sample_2"),
@@ -189,6 +202,17 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
         ]
         await query.edit_message_text("Choose a tempmail service or sample:", reply_markup=InlineKeyboardMarkup(keyboard))
 
+    elif query.data == "dotgen_start":
+        await query.edit_message_text("📩 Please send your real Gmail address:")
+        context.user_data["awaiting_gmail"] = True
+
+    elif query.data == "dotgen_new":
+        gmail = user_gmail_memory.get(query.from_user.id)
+        if gmail:
+            dot_email = generate_dot_variant(gmail)
+            keyboard = [[InlineKeyboardButton("🔁 Create New", callback_data="dotgen_new")]]
+            await query.edit_message_text(f"✅ Dot Gmail: `{dot_email}`", parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
+
     elif query.data.startswith("sample_") or query.data.startswith("account_"):
         await query.edit_message_text(f"You selected: {query.data.replace('_', ' ').title()}")
 
@@ -196,6 +220,19 @@ async def login_flow_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     chat_id = update.effective_chat.id
     text = update.message.text.strip()
     step = context.user_data.get('login_step')
+
+    
+    if context.user_data.get("awaiting_gmail"):
+        email = update.message.text.strip()
+        if "@gmail.com" not in email:
+            await update.message.reply_text("❌ Please enter a valid Gmail address.")
+            return
+        user_gmail_memory[update.message.from_user.id] = email
+        dot_email = generate_dot_variant(email)
+        keyboard = [[InlineKeyboardButton("🔁 Create New", callback_data="dotgen_new")]]
+        await update.message.reply_text(f"✅ Dot Gmail: `{dot_email}`", parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
+        context.user_data["awaiting_gmail"] = False
+        return
 
     if step == 'awaiting_email':
         context.user_data['login_email'] = text
