@@ -169,6 +169,14 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
             await context.bot.send_message(chat_id=chat_id, text="📱 Listening for incoming emails...")
             task = asyncio.create_task(poll_inbox(context, token, chat_id))
             polling_tasks[chat_id] = task
+        except Exception as e:
+            await context.bot.send_message(chat_id=chat_id, text=f"❌ Error: {e}")
+        try:
+            email, token = await create_account()
+            await context.bot.send_message(chat_id=chat_id, text=f"📬 Temp Email: `{email}`", parse_mode='Markdown')
+            await context.bot.send_message(chat_id=chat_id, text="📱 Listening for incoming emails...")
+            task = asyncio.create_task(poll_inbox(context, token, chat_id))
+            polling_tasks[chat_id] = task
 
 except Exception as e:
     await context.bot.send_message(chat_id=chat_id, text=f"❌ Error: {e}")
