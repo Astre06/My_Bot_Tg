@@ -134,7 +134,7 @@ async def account_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def tempmail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("📧 Mail.tm", callback_data="mail_tm"),
-         InlineKeyboardButton("🧚 Sample 1", callback_data="sample_1")],
+          InlineKeyboardButton("🧬 Dot Gen", callback_data="dot_gen")],
         [InlineKeyboardButton("🧚 Sample 2", callback_data="sample_2"),
          InlineKeyboardButton("🧚 Sample 3", callback_data="sample_3")]
     ]
@@ -201,11 +201,11 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
         elif query.data == "main_menu":
             keyboard = [
                 [InlineKeyboardButton("📧 Mail.tm", callback_data="mail_tm"),
-                 InlineKeyboardButton("🧚 Sample 1", callback_data="sample_1")],
+                 InlineKeyboardButton("🧬 Dot Gen", callback_data="dot_gen")],
                 [InlineKeyboardButton("🧚 Sample 2", callback_data="sample_2"),
                  InlineKeyboardButton("🧚 Sample 3", callback_data="sample_3")]
             ]
-            await query.edit_message_text("Choose a tempmail service or sample:", reply_markup=InlineKeyboardMarkup(keyboard))
+            await query.edit_message_text("Choose a tempmail:", reply_markup=InlineKeyboardMarkup(keyboard))
 
         elif query.data.startswith("sample_") or query.data.startswith("account_"):
             await query.edit_message_text(f"You selected: {query.data.replace('_', ' ').title()}")
