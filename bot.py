@@ -165,10 +165,19 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
     elif query.data == "signup_tm":
         await query.edit_message_text("📝 Creating Mail.tm account...")
         try:
-    
-        elif query.data == "dot_gen":
+            email, token = await create_account()
+            await context.bot.send_message(chat_id=chat_id, text=f"📬 Temp Email: `{email}`", parse_mode='Markdown')
+            await context.bot.send_message(chat_id=chat_id, text="📱 Listening for incoming emails...")
+            task = asyncio.create_task(poll_inbox(context, token, chat_id))
+            polling_tasks[chat_id] = task
+        except Exception as e:
+            await context.bot.send_message(chat_id=chat_id, text=f"❌ Error: {e}")
+
+    # 🟣 Dot Gen block must start AFTER the try/except finishes
+    elif query.data == "dot_gen":
         await query.edit_message_text("✉️ Please send your real Gmail address:")
         context.user_data['dot_step'] = 'awaiting_gmail'
+
 
     elif query.data == "next_dot":
         state = dot_state.get(chat_id)
