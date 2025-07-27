@@ -97,7 +97,7 @@ def generate_dot_variant(email: str) -> str:
     return email
 
 # Must include this full <td> pattern to identify correct code
-            td_pattern = r'<td align="left" class="copy lrg-number regular content-padding" style="padding-left: 40px; padding-right: 40px; font-size: 28px; line-height: 32px; letter-spacing: 6px; font-family: \'Netflix Sans\', \'Helvetica Neue\', Roboto, Segoe UI, sans-serif; font-weight: 400; color: #232323; padding-top: 20px;">\s*(\d{4,8})\s*</td>'
+                            td_pattern = r'<td align="left" class="copy lrg-number regular content-padding" style="padding-left: 40px; padding-right: 40px; font-size: 28px; line-height: 32px; letter-spacing: 6px; font-family: \'Netflix Sans\', \'Helvetica Neue\', Roboto, Segoe UI, sans-serif; font-weight: 400; color: #232323; padding-top: 20px;">\s*(\d{4,8})\s*</td>'
                             full_td_match = re.search(td_pattern, body_html, re.IGNORECASE)
                             if full_td_match:
                                 sender = full_msg.get('from', {}).get('address', 'Unknown sender')
