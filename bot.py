@@ -165,7 +165,7 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
         await query.edit_message_text("📝 Creating Mail.tm account...")
         try:
             email, token = await create_account()
-            await context.bot.send_message(chat_id=chat_id, text=f"📬 Temp Email: `{email}`", parse_mode='Markdown')
+            await context.bot.send_message(chat_id=chat_id, text=f"📬 Tempmail: `{email}`", parse_mode='Markdown')
             await context.bot.send_message(chat_id=chat_id, text="📱 Listening for incoming emails...")
             task = asyncio.create_task(poll_inbox(context, token, chat_id))
             polling_tasks[chat_id] = task
@@ -248,10 +248,10 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), login_flow_handler))
 
     await app.bot.set_my_commands([
-        BotCommand("Logout"),
-        BotCommand("Tempmail"),
-        BotCommand("Account"),
-        BotCommand("Cancel")
+        BotCommand("logout"),
+        BotCommand("tempmail"),
+        BotCommand("account"),
+        BotCommand("cancel")
     ])
 
     print("✅ Bot is running...")
