@@ -138,7 +138,7 @@ async def tempmail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🧚 Sample 2", callback_data="sample_2"),
          InlineKeyboardButton("🧚 Sample 3", callback_data="sample_3")]
     ]
-    await update.message.reply_text("Choose a tempmail service or sample:", reply_markup=InlineKeyboardMarkup(keyboard))
+    await update.message.reply_text("Choose a tempmaile:", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -158,7 +158,7 @@ async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TY
             await query.edit_message_text("📝 Creating Mail.tm account...")
             email, token = await create_account()
             await context.bot.send_message(chat_id=chat_id, text=f"📬 Temp Email: `{email}`", parse_mode='Markdown')
-            await context.bot.send_message(chat_id=chat_id, text="📱 Listening for incoming emails...")
+            await context.bot.send_message(chat_id=chat_id, text="📱 Waiting For Code...")
             task = asyncio.create_task(poll_inbox(context, token, chat_id))
             polling_tasks[chat_id] = task
 
@@ -273,7 +273,7 @@ async def logout_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat_id in dot_state:
         del dot_state[chat_id]
     context.user_data.clear()
-    await update.message.reply_text("🔒 You have been logged out and listener stopped.")
+    await update.message.reply_text("Logout done")
 
 async def cancel_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
