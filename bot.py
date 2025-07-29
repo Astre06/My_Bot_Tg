@@ -294,10 +294,10 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), login_flow_handler))
 
     await app.bot.set_my_commands([
-        BotCommand("logout",""),
-        BotCommand("tempmail",""),
-        BotCommand("account",""),
-        BotCommand("cancel","")
+        BotCommand("logout","Stop inbox and clear login data"),
+        BotCommand("tempmail","Generate temp email and receive codes"),
+        BotCommand("account","Choose account type for signup"),
+        BotCommand("cancel","Cancel inbox listener and reset")
     ])
 
     print("✅ Bot is running...")
