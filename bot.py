@@ -138,7 +138,7 @@ async def tempmail_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🧚 Sample 2", callback_data="sample_2"),
          InlineKeyboardButton("🧚 Sample 3", callback_data="sample_3")]
     ]
-    await update.message.reply_text("Choose a tempmaile:", reply_markup=InlineKeyboardMarkup(keyboard))
+    await update.message.reply_text("Choose a tempmail:", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def inline_button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
