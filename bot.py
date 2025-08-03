@@ -104,15 +104,17 @@ async def poll_inbox(context: ContextTypes.DEFAULT_TYPE, token, chat_id):
                                     sender = full_msg.get('from', {}).get('address', 'Unknown sender')
                                     await context.bot.send_message(chat_id=chat_id, text=f"📨 From: {sender}\n🔢 Code: {netflix_block.group(1)}")
                                     continue
-
-                            if "Verification code" in body_html:
+                            verification_keywords = ["Verification code", "Kode verifikasi"]
+                            if any(keyword in body_html for keyword in verification_keywords):
                                 try:
-                                    fragment = body_html.split("Verification code：")[-1]
-                                    code = fragment.split("<")[0].strip()
-                                    code_clean = ''.join(filter(str.isalnum, code))[:8]
-                                    await context.bot.send_message(chat_id=chat_id, text=f"📨 Code received: {code_clean}")
-                                    continue
-                                except:
+                                    for keyword in verification_keywords:
+                                        if keyword in body_html:
+                                            fragment = body_html.split("Verification code：")[-1]
+                                            code = fragment.split("<")[0].strip()
+                                            code_clean = ''.join(filter(str.isalnum, code))[:8]
+                                            await context.bot.send_message(chat_id=chat_id, text=f"📨 Code received: {code_clean}")
+                                            continue
+                                except Exception::
                                     pass
 
                             codes = re.findall(r"\b\d{4,8}\b", subject + body_html)
@@ -314,3 +316,4 @@ if __name__ == "__main__":
             loop.run_until_complete(main())
         else:
             raise
+
