@@ -58,6 +58,7 @@ async def get_all_domains():
                 continue
     
             for msg in data.get('hydra:member', []):
+                pass  # <-- This was missing and caused the error
 async def create_account():
     domains = await get_all_domains()
     username = generate_username()
@@ -334,6 +335,7 @@ if __name__ == "__main__":
             loop.run_until_complete(main())
         else:
             raise
+
 
 
 
