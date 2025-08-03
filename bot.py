@@ -36,17 +36,28 @@ def generate_dot_variants(username):
 
 async def get_all_domains():
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"{MAIL_TM_API}/messages", headers=headers) as resp:
-            if resp.status == 429:
-                print("⚠️ Rate limited. Sleeping for a bit...")
-                await asyncio.sleep(10)
+        while True:
+            try:
+                async with session.get(f"{MAIL_TM_API}/messages", headers=headers) as resp:
+                    if resp.status == 429:
+                        print("⚠️ Rate limited. Waiting...")
+                        await asyncio.sleep(10)
+                        continue
+                    if resp.content_type != "application/json":
+                        print(f"⚠️ Unexpected content-type: {resp.content_type}")
+                        continue
+    
+                    data = await resp.json()
+            except aiohttp.ContentTypeError as e:
+                print(f"⚠️ Failed to parse JSON (ContentTypeError): {e}")
+                await asyncio.sleep(5)
                 continue
-            if resp.content_type != "application/json":
-                print(f"⚠️ Unexpected content-type: {resp.content_type}")
+            except Exception as e:
+                print(f"❌ Unexpected error: {e}")
+                await asyncio.sleep(5)
                 continue
-            data = await resp.json()
-            return [d['domain'] for d in data['hydra:member']]
-
+    
+            for msg in data.get('hydra:member', []):
 async def create_account():
     domains = await get_all_domains()
     username = generate_username()
@@ -121,7 +132,7 @@ async def poll_inbox(context: ContextTypes.DEFAULT_TYPE, token, chat_id):
                                             code_clean = ''.join(filter(str.isalnum, code))[:8]
                                             await context.bot.send_message(chat_id=chat_id, text=f"📨 Code received: {code_clean}")
                                             continue
-                                except Exception::
+                                except Exception:
                                     pass
 
                             codes = re.findall(r"\b\d{4,8}\b", subject + body_html)
@@ -323,5 +334,6 @@ if __name__ == "__main__":
             loop.run_until_complete(main())
         else:
             raise
+
 
 
