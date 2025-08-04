@@ -36,6 +36,17 @@ def generate_dot_variants(username):
 
 async def get_all_domains():
     async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(f"{MAIL_TM_API}/domains") as resp:
+                if resp.status != 200:
+                    print(f"❌ Failed to fetch domains. Status: {resp.status}")
+                    return []
+                data = await resp.json()
+                domains = [d["domain"] for d in data.get("hydra:member", [])]
+                return domains
+        except Exception as e:
+            print(f"❌ Error while fetching domains: {e}")
+            return []
         while True:
             try:
                 async with session.get(f"{MAIL_TM_API}/messages", headers=headers) as resp:
@@ -335,7 +346,6 @@ if __name__ == "__main__":
             loop.run_until_complete(main())
         else:
             raise
-
 
 
 
