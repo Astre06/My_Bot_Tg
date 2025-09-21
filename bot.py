@@ -15,7 +15,7 @@ from telegram.ext import (
 nest_asyncio.apply()
 
 MAIL_TM_API = "https://api.mail.tm"
-BOT_TOKEN = "7524605875:AAEaaKCfmGLYjnVF5UZf9X4geE8-2SkDyBw"
+BOT_TOKEN = "7524605875:AAFIOGKMCWk87kbbmoftMe16rLTP6GRJBdQ"
 
 polling_tasks = {}
 seen_ids_map = {}
@@ -346,6 +346,7 @@ if __name__ == "__main__":
             loop.run_until_complete(main())
         else:
             raise
+
 
 
 
